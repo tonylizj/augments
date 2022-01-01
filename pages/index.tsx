@@ -2,8 +2,9 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { augmentList } from '../data/augmentList';
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTable } from 'react-table';
+import { isMobile } from 'react-device-detect';
 
 type Seqs = {
   p: string;
@@ -53,6 +54,8 @@ const nextP = (
 ) => {
   let totalMatchingP = 0;
 
+  if (choices.length === 3) return '0%';
+
   const res = validSeqs(choices);
   const sortedData = res.data;
   const totalP = res.totalP;
@@ -69,9 +72,10 @@ const nextP = (
 interface PTableProps {
   data: Seqs,
   columns: Columns,
-}
+  mobile: boolean,
+};
 
-const PTable: FC<PTableProps> = ({ data, columns }: PTableProps) => {  
+const PTable: FC<PTableProps> = ({ data, columns, mobile }: PTableProps) => {  
   const tableInstance = useTable({ columns, data });
 
   const {
@@ -101,7 +105,7 @@ const PTable: FC<PTableProps> = ({ data, columns }: PTableProps) => {
               // eslint-disable-next-line react/jsx-key
               <th {...column.getHeaderProps([
                 {
-                  className: styles.tableHeader,
+                  className: mobile ? styles.tableHeaderMobile : styles.tableHeader,
                 },
               ])}>
                 {// Render the header
@@ -129,15 +133,15 @@ const PTable: FC<PTableProps> = ({ data, columns }: PTableProps) => {
                   <td {...cell.getCellProps([
                     {
                       className: cell.value === 'Silver' ?
-                      styles.tableCellSilver
+                      `${mobile ? styles.tableCellMobile : styles.tableCell} ${styles.tableCellSilver}`
                       :
                       cell.value === 'Gold' ?
-                      styles.tableCellGold
+                      `${mobile ? styles.tableCellMobile : styles.tableCell} ${styles.tableCellGold}`
                       :
                       cell.value === 'Prismatic' ?
-                      styles.tableCellPrismatic
+                      `${mobile ? styles.tableCellMobile : styles.tableCell} ${styles.tableCellPrismatic}`
                       :
-                      styles.tableCellP,
+                      mobile ? styles.tableCellMobile : styles.tableCell
                     },
                   ])}>
                     {// Render the cell contents
@@ -155,6 +159,11 @@ const PTable: FC<PTableProps> = ({ data, columns }: PTableProps) => {
 
 const Home: NextPage = () => {
   const [choices, setChoices] = useState<number[]>([]);
+  const [mobile, setMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMobile(isMobile);
+  }, [mobile]);
 
   const seqs: Seqs = useMemo(() => {
     const res = validSeqs(choices);
@@ -187,59 +196,59 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={mobile ? styles.containerMobile : styles.container}>
       <Head>
         <title>TFT Augment Sequences</title>
         <meta name="description" content="Augment sequence probabilities for TFT." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <div className={styles.grid}>
-          <p className={styles.description}>Current choices:</p>
+      <main className={mobile ? styles.mainMobile : styles.main}>
+        <div className={mobile ? styles.gridMobile : styles.grid}>
+          <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
           {choices.length === 0 ?
-            <p className={styles.card}>
+            <p className={mobile ? styles.cardMobile : styles.card}>
               None
             </p>
             :
             choices.map((x, i) => (
-              <p className={styles.card} key={i}>
+              <p className={mobile ? styles.cardMobile : styles.card} key={i}>
                 {rarities[x]}
               </p>
             ))
           }
         </div>
-        <div className={styles.grid}>
+        <div className={mobile ? styles.gridMobile : styles.grid}>
           <button
-            className={`${styles.card} ${styles.buttonSilver}`}
+            className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonSilver}`}
             onClick={() => setChoices((x) => [...x, 1])}
             disabled={choices.length >= 3}
           >
             <p>Silver <b>{nextPs[0]}</b></p>
           </button>
           <button
-            className={`${styles.card} ${styles.buttonGold}`}
+            className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonGold}`}
             onClick={() => setChoices((x) => [...x, 2])}
             disabled={choices.length >= 3}
           >
             <p>Gold <b>{nextPs[1]}</b></p>
           </button>
           <button
-            className={`${styles.card} ${styles.buttonPrismatic}`}
+            className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonPrismatic}`}
             onClick={() => setChoices((x) => [...x, 3])}
             disabled={choices.length >= 3}
           >
             <p>Prismatic <b>{nextPs[2]}</b></p>
           </button>
           <button
-            className={styles.card}
+            className={mobile ? styles.cardMobile : styles.card}
             onClick={() => setChoices([])}
             disabled={choices.length === 0}
           >
             Reset
           </button>
         </div>
-        <PTable data={seqs} columns={columns} />
+        <PTable data={seqs} columns={columns} mobile={mobile} />
       </main>
     </div>
   )

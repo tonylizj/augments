@@ -1,9 +1,24 @@
 .container {
+  width: 100vw;
   padding: 0 2rem;
+}
+
+.containerMobile {
+  width: 100vw;
+  padding: 0 0.5rem;
 }
 
 .main {
   padding: 4rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  padding: 2rem 0;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -17,6 +32,12 @@
   font-size: 1.5rem;
 }
 
+.descriptionMobile {
+  margin: 0.5rem;
+  line-height: 1;
+  font-size: 0.8rem;
+}
+
 .grid {
   display: flex;
   align-items: center;
@@ -26,10 +47,32 @@
   margin: 0.5em;
 }
 
+.gridMobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0.2em;
+}
+
 .card {
   margin: 1rem;
   padding: 1rem 1.5rem;
   font-size: 1.25rem;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  max-width: 300px;
+}
+
+.cardMobile {
+  margin: 0.25rem;
+  padding: 0.5rem 0.5rem;
+  font-size: 0.8rem;
   text-align: left;
   color: inherit;
   text-decoration: none;
@@ -55,24 +98,32 @@
   font-size: 1.2rem;
 }
 
-.tableCellSilver {
+.tableHeaderMobile {
+  min-width: 5rem;
+  font-size: 0.8rem;
+}
+
+.tableCell {
   font-size: 1.1rem;
   height: 2rem;
   padding: 0.4rem;
+}
+
+.tableCellMobile {
+  font-size: 0.8rem;
+  height: 1rem;
+  padding: 0.2rem;
+}
+
+.tableCellSilver {
   background-color: silver;
 }
 
 .tableCellGold {
-  font-size: 1.1rem;
-  height: 2rem;
-  padding: 0.4rem;
   background-color: gold;
 }
 
 .tableCellPrismatic {
-  font-size: 1.1rem;
-  height: 2rem;
-  padding: 0.4rem;
   background-color: paleturquoise;
 }
 
@@ -86,10 +137,4 @@
 
 .buttonPrismatic {
   background-color: paleturquoise;
-}
-
-.tableCellP {
-  font-size: 1.1rem;
-  height: 2rem;
-  padding: 0.4rem;
 }
