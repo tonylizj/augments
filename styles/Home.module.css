@@ -9,15 +9,6 @@
 }
 
 .main {
-  padding: 4rem 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.main {
   padding: 2rem 0;
   flex: 1;
   display: flex;
@@ -27,7 +18,7 @@
 }
 
 .description {
-  margin: 1rem;
+  margin: 0.5rem;
   line-height: 1.5;
   font-size: 1.5rem;
 }
@@ -44,7 +35,6 @@
   justify-content: center;
   flex-wrap: wrap;
   max-width: 800px;
-  margin: 0.5em;
 }
 
 .gridMobile {
@@ -53,7 +43,6 @@
   justify-content: center;
   flex-wrap: wrap;
   max-width: 800px;
-  margin: 0.2em;
 }
 
 .card {
@@ -137,4 +126,15 @@
 
 .buttonPrismatic {
   background-color: paleturquoise;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.source {
+  margin: 0.5rem;
+  font-size: 0.8rem;
 }

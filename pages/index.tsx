@@ -5,6 +5,9 @@ import { augmentList } from '../data/augmentList';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTable } from 'react-table';
 import { isMobile } from 'react-device-detect';
+import Toggle from 'react-toggle';
+import 'react-toggle/style.css';
+import Link from 'next/link';
 
 type Seqs = {
   p: string;
@@ -20,7 +23,7 @@ type Columns = {
 
 const rarities = ['', 'Silver', 'Gold', 'Prismatic'];
 
-const validSeqs = (choices: Array<number>) => {
+const validSeqsByP = (choices: Array<number>) => {
   let totalP = 0;
 
   const processed = augmentList.filter((x) => {
@@ -30,6 +33,23 @@ const validSeqs = (choices: Array<number>) => {
     }
     return false;
   }).sort((a, b) => b[3] - a[3]);
+
+  return {
+    data: processed,
+    totalP: totalP,
+  };
+};
+
+const validSeqsByR = (choices: Array<number>) => {
+  let totalP = 0;
+
+  const processed = augmentList.filter((x) => {
+    if (x.slice(0, choices.length).toString() === choices.toString()) {
+      totalP += x[3];
+      return true;
+    }
+    return false;
+  }).sort((a, b) => ((b[0] - a[0] > 0) || (b[1] - a[1] > 0) || (b[2] - a[2] > 0)) ? -1 : 1);
 
   return {
     data: processed,
@@ -56,7 +76,7 @@ const nextP = (
 
   if (choices.length === 3) return '0%';
 
-  const res = validSeqs(choices);
+  const res = validSeqsByP(choices);
   const sortedData = res.data;
   const totalP = res.totalP;
 
@@ -159,6 +179,7 @@ const PTable: FC<PTableProps> = ({ data, columns, mobile }: PTableProps) => {
 
 const Home: NextPage = () => {
   const [choices, setChoices] = useState<number[]>([]);
+  const [sortedP, setSortedP] = useState<boolean>(true);
   const [mobile, setMobile] = useState<boolean>(false);
 
   useEffect(() => {
@@ -166,9 +187,9 @@ const Home: NextPage = () => {
   }, [mobile]);
 
   const seqs: Seqs = useMemo(() => {
-    const res = validSeqs(choices);
+    const res = sortedP ? validSeqsByP(choices) : validSeqsByR(choices);
     return formatData(res.data, res.totalP);
-  }, [choices]);
+  }, [choices, sortedP]);
 
   const columns: Columns = useMemo(() => [
     {
@@ -176,24 +197,20 @@ const Home: NextPage = () => {
       accessor: 'p',
     },
     {
-      Header: 'Augment 1 Rarity',
+      Header: 'Augment 1',
       accessor: 'a1',
     },
     {
-      Header: 'Augment 2 Rarity',
+      Header: 'Augment 2',
       accessor: 'a2',
     },
     {
-      Header: 'Augment 3 Rarity',
+      Header: 'Augment 3',
       accessor: 'a3',
     },
   ], []);
 
   const nextPs = [nextP(choices, 1), nextP(choices, 2), nextP(choices, 3)];
-
-  if (nextPs[0] === 'NaN%') {
-    setChoices((x) => x.slice(0, x.length - 1));
-  }
 
   return (
     <div className={mobile ? styles.containerMobile : styles.container}>
@@ -203,7 +220,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={mobile ? styles.mainMobile : styles.main}>
+      <main className={styles.main}>
         <div className={mobile ? styles.gridMobile : styles.grid}>
           <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
           {choices.length === 0 ?
@@ -248,7 +265,19 @@ const Home: NextPage = () => {
             Reset
           </button>
         </div>
+        <div className={styles.toggleLabel}>
+          <span className={mobile ? styles.descriptionMobile : styles.description}>Sort by probability</span>
+          <Toggle checked={sortedP} onChange={(e) => {
+            e.target.checked ?
+            setSortedP(true)
+            :
+            setSortedP(false)
+          }} />
+        </div>
         <PTable data={seqs} columns={columns} mobile={mobile} />
+        <Link href="https://github.com/tonylizj/augments">
+          <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
+        </Link>
       </main>
     </div>
   )
