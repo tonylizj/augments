@@ -275,6 +275,11 @@ const Home: NextPage = () => {
           }} />
         </div>
         <PTable data={seqs} columns={columns} mobile={mobile} />
+        <p className={styles.source}>Data up to date as of patch 12.4 from&nbsp;
+        <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/stfdr1/124_what_rarity_will_my_next_augment_be_set_65/">
+          <a target="_blank" rel="noreferrer">here</a>
+        </Link>
+        , please contact / make a pull request for corrections.</p>
         <Link href="https://github.com/tonylizj/augments">
           <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
         </Link>
