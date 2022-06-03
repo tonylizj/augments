@@ -181,6 +181,7 @@ const Home: NextPage = () => {
   const [choices, setChoices] = useState<number[]>([]);
   const [sortedP, setSortedP] = useState<boolean>(true);
   const [mobile, setMobile] = useState<boolean>(false);
+  const [patchline, setPatchline] = useState<string>('');
 
   useEffect(() => {
     setMobile(isMobile);
@@ -212,6 +213,8 @@ const Home: NextPage = () => {
 
   const nextPs = [nextP(choices, 1), nextP(choices, 2), nextP(choices, 3)];
 
+  console.log(patchline);
+
   return (
     <div className={mobile ? styles.containerMobile : styles.container}>
       <Head>
@@ -220,70 +223,87 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <div className={mobile ? styles.gridMobile : styles.grid}>
-          <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
-          {choices.length === 0 ?
-            <p className={mobile ? styles.cardMobile : styles.card}>
-              None
-            </p>
-            :
-            choices.map((x, i) => (
-              <p className={mobile ? styles.cardMobile : styles.card} key={i}>
-                {rarities[x]}
-              </p>
-            ))
-          }
-        </div>
-        <div className={mobile ? styles.gridMobile : styles.grid}>
+      {patchline === '' ?
+        <>
           <button
-            className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonSilver}`}
-            onClick={() => setChoices((x) => [...x, 1])}
-            disabled={choices.length >= 3}
+            className={mobile ? styles.cardMobile : styles.card}
+            onClick={() => setPatchline('LIVE')}
           >
-            <p>Silver <b>{nextPs[0]}</b></p>
-          </button>
-          <button
-            className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonGold}`}
-            onClick={() => setChoices((x) => [...x, 2])}
-            disabled={choices.length >= 3}
-          >
-            <p>Gold <b>{nextPs[1]}</b></p>
-          </button>
-          <button
-            className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonPrismatic}`}
-            onClick={() => setChoices((x) => [...x, 3])}
-            disabled={choices.length >= 3}
-          >
-            <p>Prismatic <b>{nextPs[2]}</b></p>
+            Set 6.5 (Live)
           </button>
           <button
             className={mobile ? styles.cardMobile : styles.card}
-            onClick={() => setChoices([])}
-            disabled={choices.length === 0}
+            onClick={() => setPatchline('PBE')}
           >
-            Reset
+            Set 7 (PBE)
           </button>
-        </div>
-        <div className={styles.toggleLabel}>
-          <span className={mobile ? styles.descriptionMobile : styles.description}>Sort by probability</span>
-          <Toggle checked={sortedP} onChange={(e) => {
-            e.target.checked ?
-            setSortedP(true)
-            :
-            setSortedP(false)
-          }} />
-        </div>
-        <PTable data={seqs} columns={columns} mobile={mobile} />
-        <p className={styles.source}>Data up to date as of patch 12.4 from&nbsp;
-        <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/stfdr1/124_what_rarity_will_my_next_augment_be_set_65/">
-          <a target="_blank" rel="noreferrer">here</a>
-        </Link>
-        , please contact / make a pull request for corrections.</p>
-        <Link href="https://github.com/tonylizj/augments">
-          <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
-        </Link>
-      </main>
+        </>
+        :
+        <main className={styles.main}>
+          <div className={mobile ? styles.gridMobile : styles.grid}>
+            <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
+            {choices.length === 0 ?
+              <p className={mobile ? styles.cardMobile : styles.card}>
+                None
+              </p>
+              :
+              choices.map((x, i) => (
+                <p className={mobile ? styles.cardMobile : styles.card} key={i}>
+                  {rarities[x]}
+                </p>
+              ))
+            }
+          </div>
+          <div className={mobile ? styles.gridMobile : styles.grid}>
+            <button
+              className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonSilver}`}
+              onClick={() => setChoices((x) => [...x, 1])}
+              disabled={choices.length >= 3}
+            >
+              <p>Silver <b>{nextPs[0]}</b></p>
+            </button>
+            <button
+              className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonGold}`}
+              onClick={() => setChoices((x) => [...x, 2])}
+              disabled={choices.length >= 3}
+            >
+              <p>Gold <b>{nextPs[1]}</b></p>
+            </button>
+            <button
+              className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonPrismatic}`}
+              onClick={() => setChoices((x) => [...x, 3])}
+              disabled={choices.length >= 3}
+            >
+              <p>Prismatic <b>{nextPs[2]}</b></p>
+            </button>
+            <button
+              className={mobile ? styles.cardMobile : styles.card}
+              onClick={() => setChoices([])}
+              disabled={choices.length === 0}
+            >
+              Reset
+            </button>
+          </div>
+          <div className={styles.toggleLabel}>
+            <span className={mobile ? styles.descriptionMobile : styles.description}>Sort by probability</span>
+            <Toggle checked={sortedP} onChange={(e) => {
+              e.target.checked ?
+              setSortedP(true)
+              :
+              setSortedP(false)
+            }} />
+          </div>
+          <PTable data={seqs} columns={columns} mobile={mobile} />
+          <p className={styles.source}>Data up to date as of patch 12.10 from&nbsp;
+          <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/stfdr1/124_what_rarity_will_my_next_augment_be_set_65/">
+            <a target="_blank" rel="noreferrer">here</a>
+          </Link>
+          , please contact / make a pull request for corrections.</p>
+          <Link href="https://github.com/tonylizj/augments">
+            <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
+          </Link>
+        </main>
+      }
     </div>
   )
 };
