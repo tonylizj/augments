@@ -223,8 +223,6 @@ const Home: NextPage = () => {
 
   const nextPs = [nextP(choices, 1, usePBE), nextP(choices, 2, usePBE), nextP(choices, 3, usePBE)];
 
-  console.log(usePBE);
-
   return (
     <div className={mobile ? styles.containerMobile : styles.container}>
       <Head>
@@ -239,7 +237,7 @@ const Home: NextPage = () => {
             className={mobile ? styles.cardMobile : styles.card}
             onClick={() => setPatchline(LIVE)}
           >
-            Set 6.5 (Live)
+            Set 6.5 (LIVE)
           </button>
           <button
             className={mobile ? styles.cardMobile : styles.card}
@@ -254,7 +252,7 @@ const Home: NextPage = () => {
             className={mobile ? styles.cardMobile : styles.card}
             onClick={() => setPatchline('')}
           >
-            Change Patchline
+            Change Patchline (Current: {patchline})
           </button>
           <div className={mobile ? styles.gridMobile : styles.grid}>
             <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
