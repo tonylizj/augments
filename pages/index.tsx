@@ -1,13 +1,16 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { augmentList } from '../data/augmentList';
+import { augmentList, augmentListPBE } from '../data/augmentList';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTable } from 'react-table';
 import { isMobile } from 'react-device-detect';
 import Toggle from 'react-toggle';
 import 'react-toggle/style.css';
 import Link from 'next/link';
+
+const LIVE = 'LIVE';
+const PBE = 'PBE';
 
 type Seqs = {
   p: string;
@@ -23,10 +26,12 @@ type Columns = {
 
 const rarities = ['', 'Silver', 'Gold', 'Prismatic'];
 
-const validSeqsByP = (choices: Array<number>) => {
+const validSeqsByP = (choices: Array<number>, usePBE: boolean) => {
   let totalP = 0;
 
-  const processed = augmentList.filter((x) => {
+  const augments = usePBE ? augmentListPBE : augmentList;
+
+  const processed = augments.filter((x) => {
     if (x.slice(0, choices.length).toString() === choices.toString()) {
       totalP += x[3];
       return true;
@@ -40,10 +45,12 @@ const validSeqsByP = (choices: Array<number>) => {
   };
 };
 
-const validSeqsByR = (choices: Array<number>) => {
+const validSeqsByR = (choices: Array<number>, usePBE: boolean) => {
   let totalP = 0;
 
-  const processed = augmentList.filter((x) => {
+  const augments = usePBE ? augmentListPBE : augmentList;
+
+  const processed = augments.filter((x) => {
     if (x.slice(0, choices.length).toString() === choices.toString()) {
       totalP += x[3];
       return true;
@@ -71,12 +78,13 @@ const formatData = (sortedData: number[][], totalP: number) => {
 const nextP = (
   choices: Array<number>,
   rarity: number,
+  usePBE: boolean,
 ) => {
   let totalMatchingP = 0;
 
   if (choices.length === 3) return '0%';
 
-  const res = validSeqsByP(choices);
+  const res = validSeqsByP(choices, usePBE);
   const sortedData = res.data;
   const totalP = res.totalP;
 
@@ -183,14 +191,16 @@ const Home: NextPage = () => {
   const [mobile, setMobile] = useState<boolean>(false);
   const [patchline, setPatchline] = useState<string>('');
 
+  const usePBE = patchline === PBE;
+
   useEffect(() => {
     setMobile(isMobile);
   }, [mobile]);
 
   const seqs: Seqs = useMemo(() => {
-    const res = sortedP ? validSeqsByP(choices) : validSeqsByR(choices);
+    const res = sortedP ? validSeqsByP(choices, usePBE) : validSeqsByR(choices, usePBE);
     return formatData(res.data, res.totalP);
-  }, [choices, sortedP]);
+  }, [choices, sortedP, usePBE]);
 
   const columns: Columns = useMemo(() => [
     {
@@ -211,9 +221,9 @@ const Home: NextPage = () => {
     },
   ], []);
 
-  const nextPs = [nextP(choices, 1), nextP(choices, 2), nextP(choices, 3)];
+  const nextPs = [nextP(choices, 1, usePBE), nextP(choices, 2, usePBE), nextP(choices, 3, usePBE)];
 
-  console.log(patchline);
+  console.log(usePBE);
 
   return (
     <div className={mobile ? styles.containerMobile : styles.container}>
@@ -224,22 +234,28 @@ const Home: NextPage = () => {
       </Head>
 
       {patchline === '' ?
-        <>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5rem' }}>
           <button
             className={mobile ? styles.cardMobile : styles.card}
-            onClick={() => setPatchline('LIVE')}
+            onClick={() => setPatchline(LIVE)}
           >
             Set 6.5 (Live)
           </button>
           <button
             className={mobile ? styles.cardMobile : styles.card}
-            onClick={() => setPatchline('PBE')}
+            onClick={() => setPatchline(PBE)}
           >
             Set 7 (PBE)
           </button>
-        </>
+        </div>
         :
         <main className={styles.main}>
+          <button
+            className={mobile ? styles.cardMobile : styles.card}
+            onClick={() => setPatchline('')}
+          >
+            Change Patchline
+          </button>
           <div className={mobile ? styles.gridMobile : styles.grid}>
             <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
             {choices.length === 0 ?
@@ -296,6 +312,11 @@ const Home: NextPage = () => {
           <PTable data={seqs} columns={columns} mobile={mobile} />
           <p className={styles.source}>Data up to date as of patch 12.10 from&nbsp;
           <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/stfdr1/124_what_rarity_will_my_next_augment_be_set_65/">
+            <a target="_blank" rel="noreferrer">here</a>
+          </Link>
+          {' '}
+          and 12.11 from&nbsp;
+          <Link href="https://twitter.com/Mortdog/status/1532381141491101697">
             <a target="_blank" rel="noreferrer">here</a>
           </Link>
           , please contact / make a pull request for corrections.</p>
