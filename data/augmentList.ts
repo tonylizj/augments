@@ -1,3 +1,18 @@
+
+/**
+ * Each entry is an example scenario
+ * 
+ * The entry is formatted as
+ * 
+ * (first_given_aug, second_given_aug, third_given_augment, probability_that_scenario_occurs)
+ * 
+ * Augments are referenced by an int
+ *  1 - Silver
+ *  2 - Gold
+ *  3 - Prismatic
+ *  4 - Hero
+ * 
+ */
 export const augmentList = [
   [1, 1, 2, 30],
   [1, 1, 3, 9],

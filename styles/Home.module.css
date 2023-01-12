@@ -116,6 +116,10 @@
   background-color: paleturquoise;
 }
 
+.tableCellHero {
+  background-color: brown;
+}
+
 .buttonSilver {
   background-color: silver;
 }
@@ -126,6 +130,10 @@
 
 .buttonPrismatic {
   background-color: paleturquoise;
+}
+
+.buttonHero {
+  background-color: brown;
 }
 
 .toggleLabel {
