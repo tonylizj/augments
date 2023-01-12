@@ -266,7 +266,7 @@ const Home: NextPage = () => {
             className={mobile ? styles.cardMobile : styles.card}
             onClick={() => setPatchline(PBE)}
           >
-            Set 8 : 13.2 (PBE)
+            Set 8 (PBE)
           </button>
         </div>
         :
@@ -295,7 +295,7 @@ const Home: NextPage = () => {
             <button
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonSilver}`}
               onClick={() => setChoices((x) => [...x, 1])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[0] === '0%'}
             >
               <p>Silver <b>{nextPs[0]}</b></p>
             </button>
@@ -303,7 +303,7 @@ const Home: NextPage = () => {
             <button
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonGold}`}
               onClick={() => setChoices((x) => [...x, 2])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[1] === '0%'}
             >
               <p>Gold <b>{nextPs[1]}</b></p>
             </button>
@@ -311,7 +311,7 @@ const Home: NextPage = () => {
             <button
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonPrismatic}`}
               onClick={() => setChoices((x) => [...x, 3])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[2] === '0%'}
             >
               <p>Prismatic <b>{nextPs[2]}</b></p>
             </button>
@@ -319,7 +319,7 @@ const Home: NextPage = () => {
             <button 
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonHero}`}
               onClick={() => setChoices((x) => [...x, 4])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[3] === '0%'}
             >
               <p>Hero <b>{nextPs[3]}</b></p>
             </button>
@@ -342,11 +342,13 @@ const Home: NextPage = () => {
             }} />
           </div>
           <PTable data={seqs} columns={columns} mobile={mobile} />
-          <p className={styles.source}>Data up to date as of patch 13.1 from&nbsp;
+          <p className={styles.source}>Data up to date as of patch 13.1 ( see&nbsp;
           <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/108lq8v/updated_augment_odds_table_for_patch_131/">
             <a target="_blank" rel="noreferrer">here</a>
           </Link>
+          )
           {' '}
+          <br />
           please contact / make a pull request for corrections.</p>
           <Link href="https://github.com/tonylizj/augments">
             <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
