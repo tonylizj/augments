@@ -12,7 +12,6 @@ import Link from 'next/link';
 const LIVE = 'LIVE';
 const PBE = 'PBE';
 
-// Types for describing the probabilities table
 type Seqs = {
   p: string;
   a1: string;
@@ -82,12 +81,6 @@ const validSeqsByR = (choices: Array<number>, usePBE: boolean) => {
   };
 };
 
-/**
- * 
- * @param sortedData 
- * @param totalP 
- * @returns 
- */
 const formatData = (sortedData: number[][], totalP: number) => {
   return sortedData.map((x) => {
     return {
