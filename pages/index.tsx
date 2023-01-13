@@ -24,8 +24,18 @@ type Columns = {
   accessor: 'p' | 'a1' | 'a2' | 'a3';
 }[];
 
-const rarities = ['', 'Silver', 'Gold', 'Prismatic'];
+const rarities = ['', 'Silver', 'Gold', 'Prismatic', 'Hero'];
 
+/**
+ * 
+ * Return valid augment sequences sorted by probability
+ * 
+ * TODO: when user clicks at end of valid sequence, it shouldnt continue
+ * 
+ * @param choices: augments selected so far
+ * @param usePBE 
+ * @returns Filtered sequences and the total probability 
+ */
 const validSeqsByP = (choices: Array<number>, usePBE: boolean) => {
   let totalP = 0;
 
@@ -45,6 +55,13 @@ const validSeqsByP = (choices: Array<number>, usePBE: boolean) => {
   };
 };
 
+/**
+ * Same as validSeqsByP but returns in no specific order
+ * 
+ * @param choices 
+ * @param usePBE 
+ * @returns 
+ */
 const validSeqsByR = (choices: Array<number>, usePBE: boolean) => {
   let totalP = 0;
 
@@ -75,6 +92,7 @@ const formatData = (sortedData: number[][], totalP: number) => {
   });
 };
 
+// function for calculating the decision tree probabilities
 const nextP = (
   choices: Array<number>,
   rarity: number,
@@ -169,6 +187,9 @@ const PTable: FC<PTableProps> = ({ data, columns, mobile }: PTableProps) => {
                       cell.value === 'Prismatic' ?
                       `${mobile ? styles.tableCellMobile : styles.tableCell} ${styles.tableCellPrismatic}`
                       :
+                      cell.value === 'Hero' ?
+                      `${mobile ? styles.tableCellMobile: styles.tableCell} ${styles.tableCellHero}`
+                      :
                       mobile ? styles.tableCellMobile : styles.tableCell
                     },
                   ])}>
@@ -184,6 +205,7 @@ const PTable: FC<PTableProps> = ({ data, columns, mobile }: PTableProps) => {
     </table>
   )
 };
+
 
 const Home: NextPage = () => {
   const [choices, setChoices] = useState<number[]>([]);
@@ -221,7 +243,8 @@ const Home: NextPage = () => {
     },
   ], []);
 
-  const nextPs = [nextP(choices, 1, usePBE), nextP(choices, 2, usePBE), nextP(choices, 3, usePBE)];
+  // probability that next augment will be <type>
+  const nextPs = [nextP(choices, 1, usePBE), nextP(choices, 2, usePBE), nextP(choices, 3, usePBE), nextP(choices, 4, usePBE)];
 
   return (
     <div className={mobile ? styles.containerMobile : styles.container}>
@@ -237,13 +260,13 @@ const Home: NextPage = () => {
             className={mobile ? styles.cardMobile : styles.card}
             onClick={() => setPatchline(LIVE)}
           >
-            Set 6.5 (LIVE)
+            Set 8 (LIVE)
           </button>
           <button
             className={mobile ? styles.cardMobile : styles.card}
             onClick={() => setPatchline(PBE)}
           >
-            Set 7 (PBE)
+            Set 8 (PBE)
           </button>
         </div>
         :
@@ -272,24 +295,35 @@ const Home: NextPage = () => {
             <button
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonSilver}`}
               onClick={() => setChoices((x) => [...x, 1])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[0] === '0%'}
             >
               <p>Silver <b>{nextPs[0]}</b></p>
             </button>
+
             <button
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonGold}`}
               onClick={() => setChoices((x) => [...x, 2])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[1] === '0%'}
             >
               <p>Gold <b>{nextPs[1]}</b></p>
             </button>
+
             <button
               className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonPrismatic}`}
               onClick={() => setChoices((x) => [...x, 3])}
-              disabled={choices.length >= 3}
+              disabled={choices.length >= 3 || nextPs[2] === '0%'}
             >
               <p>Prismatic <b>{nextPs[2]}</b></p>
             </button>
+
+            <button 
+              className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonHero}`}
+              onClick={() => setChoices((x) => [...x, 4])}
+              disabled={choices.length >= 3 || nextPs[3] === '0%'}
+            >
+              <p>Hero <b>{nextPs[3]}</b></p>
+            </button>
+
             <button
               className={mobile ? styles.cardMobile : styles.card}
               onClick={() => setChoices([])}
@@ -308,16 +342,14 @@ const Home: NextPage = () => {
             }} />
           </div>
           <PTable data={seqs} columns={columns} mobile={mobile} />
-          <p className={styles.source}>Data up to date as of patch 12.10 from&nbsp;
-          <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/stfdr1/124_what_rarity_will_my_next_augment_be_set_65/">
+          <p className={styles.source}>Data up to date as of patch 13.1 ( see&nbsp;
+          <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/108lq8v/updated_augment_odds_table_for_patch_131/">
             <a target="_blank" rel="noreferrer">here</a>
           </Link>
+          )
           {' '}
-          and 12.11 from&nbsp;
-          <Link href="https://twitter.com/Mortdog/status/1532381141491101697">
-            <a target="_blank" rel="noreferrer">here</a>
-          </Link>
-          , please contact / make a pull request for corrections.</p>
+          <br />
+          please contact / make a pull request for corrections.</p>
           <Link href="https://github.com/tonylizj/augments">
             <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
           </Link>
