@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import { augmentList, augmentListPBE } from '../data/augmentList';
+import { augmentList, augmentListUniversity } from '../data/augmentList';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTable } from 'react-table';
 import { isMobile } from 'react-device-detect';
@@ -9,8 +9,8 @@ import Toggle from 'react-toggle';
 import 'react-toggle/style.css';
 import Link from 'next/link';
 
-const LIVE = 'LIVE';
-const PBE = 'PBE';
+const regular = 'REGULAR';
+const theUniversity = 'UNIVERSITY';
 
 type Seqs = {
   p: string;
@@ -24,7 +24,7 @@ type Columns = {
   accessor: 'p' | 'a1' | 'a2' | 'a3';
 }[];
 
-const rarities = ['', 'Silver', 'Gold', 'Prismatic', 'Hero'];
+const rarities = ['', 'Silver', 'Gold', 'Prismatic'];
 
 /**
  * 
@@ -33,13 +33,13 @@ const rarities = ['', 'Silver', 'Gold', 'Prismatic', 'Hero'];
  * TODO: when user clicks at end of valid sequence, it shouldnt continue
  * 
  * @param choices: augments selected so far
- * @param usePBE 
+ * @param useTheUniversity 
  * @returns Filtered sequences and the total probability 
  */
-const validSeqsByP = (choices: Array<number>, usePBE: boolean) => {
+const validSeqsByP = (choices: Array<number>, useTheUniversity: boolean) => {
   let totalP = 0;
 
-  const augments = usePBE ? augmentListPBE : augmentList;
+  const augments = useTheUniversity ? augmentListUniversity : augmentList;
 
   const processed = augments.filter((x) => {
     if (x.slice(0, choices.length).toString() === choices.toString()) {
@@ -59,13 +59,13 @@ const validSeqsByP = (choices: Array<number>, usePBE: boolean) => {
  * Same as validSeqsByP but returns in no specific order
  * 
  * @param choices 
- * @param usePBE 
+ * @param useTheUniversity 
  * @returns 
  */
-const validSeqsByR = (choices: Array<number>, usePBE: boolean) => {
+const validSeqsByR = (choices: Array<number>, useTheUniversity: boolean) => {
   let totalP = 0;
 
-  const augments = usePBE ? augmentListPBE : augmentList;
+  const augments = useTheUniversity ? augmentListUniversity : augmentList;
 
   const processed = augments.filter((x) => {
     if (x.slice(0, choices.length).toString() === choices.toString()) {
@@ -96,13 +96,13 @@ const formatData = (sortedData: number[][], totalP: number) => {
 const nextP = (
   choices: Array<number>,
   rarity: number,
-  usePBE: boolean,
+  useTheUniversity: boolean,
 ) => {
   let totalMatchingP = 0;
 
   if (choices.length === 3) return '0%';
 
-  const res = validSeqsByP(choices, usePBE);
+  const res = validSeqsByP(choices, useTheUniversity);
   const sortedData = res.data;
   const totalP = res.totalP;
 
@@ -211,18 +211,18 @@ const Home: NextPage = () => {
   const [choices, setChoices] = useState<number[]>([]);
   const [sortedP, setSortedP] = useState<boolean>(true);
   const [mobile, setMobile] = useState<boolean>(false);
-  const [patchline, setPatchline] = useState<string>('');
+  const [dataSource, setDataSource] = useState<string>('');
 
-  const usePBE = patchline === PBE;
+  const useTheUniversity = dataSource === theUniversity;
 
   useEffect(() => {
     setMobile(isMobile);
   }, [mobile]);
 
   const seqs: Seqs = useMemo(() => {
-    const res = sortedP ? validSeqsByP(choices, usePBE) : validSeqsByR(choices, usePBE);
+    const res = sortedP ? validSeqsByP(choices, useTheUniversity) : validSeqsByR(choices, useTheUniversity);
     return formatData(res.data, res.totalP);
-  }, [choices, sortedP, usePBE]);
+  }, [choices, sortedP, useTheUniversity]);
 
   const columns: Columns = useMemo(() => [
     {
@@ -244,7 +244,7 @@ const Home: NextPage = () => {
   ], []);
 
   // probability that next augment will be <type>
-  const nextPs = [nextP(choices, 1, usePBE), nextP(choices, 2, usePBE), nextP(choices, 3, usePBE), nextP(choices, 4, usePBE)];
+  const nextPs = [nextP(choices, 1, useTheUniversity), nextP(choices, 2, useTheUniversity), nextP(choices, 3, useTheUniversity), nextP(choices, 4, useTheUniversity)];
 
   return (
     <div className={mobile ? styles.containerMobile : styles.container}>
@@ -254,28 +254,28 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {patchline === '' ?
+      {dataSource === '' ?
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '5rem' }}>
           <button
             className={mobile ? styles.cardMobile : styles.card}
-            onClick={() => setPatchline(LIVE)}
+            onClick={() => setDataSource(regular)}
           >
-            Set 8 (LIVE)
+            Set 9 (Regular)
           </button>
           <button
             className={mobile ? styles.cardMobile : styles.card}
-            onClick={() => setPatchline(PBE)}
+            onClick={() => setDataSource(theUniversity)}
           >
-            Set 8 (PBE)
+            Set 9 (The University)
           </button>
         </div>
         :
         <main className={styles.main}>
           <button
             className={mobile ? styles.cardMobile : styles.card}
-            onClick={() => setPatchline('')}
+            onClick={() => setDataSource('')}
           >
-            Change Patchline (Current: {patchline})
+            Change Patchline (Current: {dataSource})
           </button>
           <div className={mobile ? styles.gridMobile : styles.grid}>
             <p className={mobile ? styles.descriptionMobile : styles.description}>Current choices:</p>
@@ -316,14 +316,6 @@ const Home: NextPage = () => {
               <p>Prismatic <b>{nextPs[2]}</b></p>
             </button>
 
-            <button 
-              className={`${mobile ? styles.cardMobile : styles.card} ${styles.buttonHero}`}
-              onClick={() => setChoices((x) => [...x, 4])}
-              disabled={choices.length >= 3 || nextPs[3] === '0%'}
-            >
-              <p>Hero <b>{nextPs[3]}</b></p>
-            </button>
-
             <button
               className={mobile ? styles.cardMobile : styles.card}
               onClick={() => setChoices([])}
@@ -342,14 +334,14 @@ const Home: NextPage = () => {
             }} />
           </div>
           <PTable data={seqs} columns={columns} mobile={mobile} />
-          <p className={styles.source}>Data up to date as of patch 13.1 ( see&nbsp;
-          <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/108lq8v/updated_augment_odds_table_for_patch_131/">
+          <p className={styles.source}>Data up to date as of patch 13.12 (Set 9) (see&nbsp;
+          <Link href="https://www.reddit.com/r/CompetitiveTFT/comments/1493yel/updated_augment_chances_for_runeterra_reforged/">
             <a target="_blank" rel="noreferrer">here</a>
           </Link>
           )
           {' '}
           <br />
-          please contact / make a pull request for corrections.</p>
+          Please contact / make a pull request for corrections.</p>
           <Link href="https://github.com/tonylizj/augments">
             <a className={styles.source} target="_blank" rel="noreferrer">Source code: https://github.com/tonylizj/augments</a>
           </Link>
